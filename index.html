@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Regali da Tokyo</title>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f0eb;--ink:#14213d;--card:#fff;--line:#d9d5cb;--stamp:#d7263d;--yellow:#f6c026;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1830;--ink:#f2f0eb;--card:#18254a;--line:#2c3b66}}
+:root[data-theme="dark"]{--bg:#0f1830;--ink:#f2f0eb;--card:#18254a;--line:#2c3b66}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New",system-ui,sans-serif;line-height:1.5;min-height:100vh}
+main{max-width:560px;margin:0 auto;padding:40px 20px 56px}
+.stamp{display:inline-grid;place-items:center;width:64px;height:64px;border:3px solid var(--stamp);color:var(--stamp);border-radius:8px;font-family:"Dela Gothic One",sans-serif;font-size:26px;transform:rotate(-8deg);margin-bottom:20px}
+h1{font-family:"Dela Gothic One",system-ui,sans-serif;font-weight:400;font-size:clamp(34px,9vw,48px);line-height:1.1;margin:0 0 14px}
+.intro{font-size:17px;max-width:44ch;margin:0 0 32px}
+h2{font-size:15px;font-weight:700;margin:0 0 12px}
+.names{display:grid;gap:10px}
+.name{display:flex;align-items:center;gap:14px;width:100%;padding:12px 16px;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:999px;font:700 18px "Zen Kaku Gothic New",sans-serif;text-align:left;cursor:pointer}
+.name:hover{border-color:var(--ink)}
+.name:focus-visible,input:focus-visible,.go:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.dot{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;color:#fff;font-size:15px}
+.panel{margin-top:28px;padding:22px;background:var(--card);border:2px solid var(--ink);border-radius:14px}
+.panel[hidden]{display:none}
+.q{font-size:20px;font-weight:700;margin:0 0 14px}
+.row{display:flex;gap:10px}
+input{flex:1;min-width:0;padding:12px 14px;font:inherit;font-size:18px;background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:10px}
+.go{padding:12px 20px;font:700 17px "Zen Kaku Gothic New",sans-serif;background:var(--yellow);color:#14213d;border:0;border-radius:10px;cursor:pointer}
+.msg{min-height:1.5em;margin:10px 0 0;font-size:15px;color:var(--stamp)}
+.yn{position:relative;height:110px;margin-bottom:6px}
+.yn .go{position:absolute;top:0;min-width:96px;transition:left .15s,top .15s}
+#yes{left:0}
+#no{right:0;background:var(--card);color:var(--ink);border:2px solid var(--ink)}
+.hint{font-size:13px;opacity:.7;margin:0}
+@media (prefers-reduced-motion:reduce){.yn .go{transition:none}}
+textarea{width:100%;min-height:120px;padding:12px 14px;font:inherit;font-size:18px;background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:10px;resize:vertical}
+textarea:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.note{font-size:14px;opacity:.75;margin:0 0 16px}
+.load{text-align:center}
+.spin{width:44px;height:44px;margin:6px auto 16px;border:4px solid var(--line);border-top-color:var(--stamp);border-radius:50%}
+@media (prefers-reduced-motion:no-preference){.spin{animation:rot 1s linear infinite}@keyframes rot{to{transform:rotate(360deg)}}}
+.prog{font-size:14px;margin:0 0 6px;opacity:.75}
+.opts{display:grid;gap:10px}
+.opt{width:100%;padding:12px 16px;background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:10px;font:700 17px "Zen Kaku Gothic New",sans-serif;text-align:left;cursor:pointer}
+.opt:hover{border-color:var(--ink)}
+.opt:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.opt.bad{border-color:var(--stamp);color:var(--stamp)}
+.ok h3{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:26px;margin:0 0 8px}
+@media (prefers-reduced-motion:no-preference){.shake{animation:sh .3s}@keyframes sh{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}}
+</style>
+</head>
+<body>
+<main>
+  <div class="stamp" aria-hidden="true">東京</div>
+  <h1>Cosa ti porto da Tokyo?</h1>
+  <p class="intro">Sto per partire per il Giappone e voglio tornare con qualcosa per ognuno di voi. Entra, e dimmi cosa vuoi (devi meritarlo).</p>
+
+  <h2>Chi sei?</h2>
+  <div class="names" id="names"></div>
+
+  <section class="panel" id="gate" hidden aria-live="polite">
+    <p class="q" id="question"></p>
+    <div class="row">
+      <input id="answer" type="text" autocomplete="off" autocapitalize="none" aria-label="La tua risposta">
+      <button class="go" id="enter" type="button">Entra</button>
+    </div>
+    <p class="msg" id="msg"></p>
+  </section>
+
+  <section class="panel" id="quiz" hidden aria-live="polite">
+    <p class="note" id="qnote">(Le domande sono generate e le tue risposte saranno valutate dalla mia AI, che è addestrata su di me: deciderà lei se sei meritevole. Muhahaha)</p>
+    <p class="prog" id="prog"></p>
+    <p class="q" id="qtext"></p>
+    <textarea id="qans" rows="3" aria-label="La tua risposta"></textarea>
+    <div class="row" style="margin-top:12px"><button class="go" id="next" type="button">Avanti</button></div>
+    <p class="msg" id="qmsg"></p>
+  </section>
+
+  <section class="panel load" id="loading" hidden aria-live="polite">
+    <div class="spin" aria-hidden="true"></div>
+    <p class="q">L'AI sta valutando se sei meritevole…</p>
+  </section>
+
+  <section class="panel ok" id="done" hidden>
+    <h3 id="welcome"></h3>
+    <div id="ask">
+      <p class="q">Quindi credi di meritarlo?</p>
+      <div class="yn" id="yn">
+        <button class="go" id="yes" type="button">Sì</button>
+        <button class="go no" id="no" type="button">No</button>
+      </div>
+      <p class="hint">(sì, devi cliccare no)</p>
+    </div>
+  </section>
+
+  <section class="panel ok" id="gifts" hidden>
+    <h3 id="gtitle"></h3>
+    <p>Scrivi tutto quello che vuoi che ti porti dal Giappone, senza limiti. Siete la mia famiglia e vi voglio un bene infinito.</p>
+    <textarea id="gtext" rows="5" aria-label="I tuoi regali"></textarea>
+    <div class="row" style="margin-top:12px"><button class="go" id="send" type="button">Invia</button></div>
+    <p class="msg" id="gmsg"></p>
+  </section>
+</main>
+
+<script>
+// Le risposte sono salvate come hash SHA-256 (minuscolo, senza spazi ai bordi).
+const PEOPLE = [
+  {id:"kekka", name:"Kekka", color:"#e60012", q:"Il nomignolo che uso per te?", h:["6446d58d6dfafd58586d3ea85a53f4a6b3cc057f933a22bb58e188a74ac8f663"]},
+  {id:"giulia", name:"Giulia", color:"#f39700", q:"Nella lontana regione di…?", h:["cf4e39ae462a0f95b17df439ce97a49187cbbdda9c658129ff5f5cd27a2884bc"]},
+  {id:"marta", name:"Marta", color:"#009944", q:"Se io sono Jake Peralta, tu sei…?", h:["1906bc7c801f03c41551b06e2fd406e8f471787c51357e8731ec61dd599f04c8","a0e4b24befd6b116b340c5fd5b1f09645d42734518e380208b1bb671c6bb57e6"]},
+  {id:"odry", name:"Odry", color:"#0079c2", q:"Il nostro negozio preferito?", h:["bd938c688f49b77c7fc537c6b9222e2c97ebddd63076b87f2feaec66fb9c05d0"]},
+  {id:"saso", name:"Saso", color:"#9b7cb6", q:"O blue?", h:["0c030586945fe504b604ecc2e875c38ede400cd5cd73da9730302162e6b02c6f"]}
+];
+const $ = id => document.getElementById(id);
+let current = null;
+
+async function sha(text){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+PEOPLE.forEach(p => {
+  const b = document.createElement("button");
+  b.className = "name"; b.type = "button";
+  b.innerHTML = `<span class="dot" style="background:${p.color}">${p.name[0]}</span>${p.name}`;
+  b.addEventListener("click", () => pick(p));
+  $("names").appendChild(b);
+});
+
+function pick(p){
+  current = p;
+  hideAll();
+  $("gate").hidden = false;
+  $("question").textContent = p.q;
+  $("msg").textContent = "";
+  $("answer").value = "";
+  $("answer").focus();
+  $("gate").scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+async function check(){
+  if(!current) return;
+  const val = $("answer").value.trim().toLowerCase();
+  const ok = val && current.h.includes(await sha(val));
+  if(ok){
+    $("gate").hidden = true;
+    startQuiz();
+  } else {
+    $("msg").textContent = "Non è questa. Riprova.";
+    const g = $("gate"); g.classList.remove("shake"); void g.offsetWidth; g.classList.add("shake");
+  }
+}
+// Per salvare le risposte nel Google Sheet: incolla qui l'URL dell'app web di Apps Script.
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbzfPKf9UlEUYsYPWRaazJvLkT834cDo5NzoV0wF6GQGfVZxUL1Ql_23nFWs31KR8Xsm/exec";
+const BENE = "Quanto mi vuoi bene? (se sei Adriana non puoi mettere 0)";
+const SET_A = ["Qual è la mia serie preferita?","Qual è stata la serata più assurda che abbiamo fatto insieme?","Se sparissi per 24 ore, dove sarebbe più probabile trovarmi?","Quale cosa comprerei anche se non mi servisse assolutamente?","Preferisco avere ragione o evitare una discussione?",BENE];
+const SET_B = ["Qual è stata la cosa più divertente che abbiamo fatto insieme?","Qual è la scusa che uso più spesso?","Se vincessi 1 milione di euro, qual è la prima cosa che comprerei?","Quale momento nostro pensi che nessuno degli altri qui potrebbe capire davvero?","Qual è la mia serie preferita?",BENE];
+const QUIZ = {
+  kekka:SET_A, saso:SET_A, odry:SET_B, marta:SET_B,
+  giulia:["Qual è il ricordo più bello che hai con me?","Qual è stata la nostra prima uscita?","Qual è stata la cosa più assurda che abbiamo fatto insieme?","Qual è il posto che associ di più a un bel ricordo con me?","Quale momento nostro pensi che nessuno degli altri qui potrebbe capire davvero?"]
+};
+let qi = 0, answers = [];
+function hideAll(){ ["gate","quiz","loading","done","gifts"].forEach(id => $(id).hidden = true); }
+function send(payload){
+  if(!SHEET_URL) return;
+  try{ fetch(SHEET_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},body:JSON.stringify(payload)}).catch(()=>{}); }catch(e){}
+}
+function startQuiz(){ qi = 0; answers = []; $("quiz").hidden = false; showQ(); }
+function showQ(){
+  const qs = QUIZ[current.id];
+  $("qnote").hidden = qi > 0;
+  $("prog").textContent = `Domanda ${qi+1} di ${qs.length}`;
+  $("qtext").textContent = qs[qi];
+  $("qans").value = ""; $("qmsg").textContent = "";
+  $("next").textContent = qi === qs.length-1 ? "Invia risposte" : "Avanti";
+  $("qans").focus();
+}
+function nextQ(){
+  const qs = QUIZ[current.id], a = $("qans").value.trim();
+  if(!a){ $("qmsg").textContent = "Scrivi una risposta."; return; }
+  answers.push({q:qs[qi], a});
+  qi++;
+  if(qi < qs.length){ showQ(); return; }
+  send({type:"risposte", name:current.name, answers});
+  $("quiz").hidden = true; $("loading").hidden = false;
+  setTimeout(() => {
+    $("loading").hidden = true;
+    $("welcome").textContent = `Ciao ${current.name}!`;
+    $("yes").style.left = "0px"; $("yes").style.top = "0px";
+    $("done").hidden = false;
+  }, 5000);
+}
+$("next").addEventListener("click", nextQ);
+$("send").addEventListener("click", () => {
+  const t = $("gtext").value.trim();
+  if(!t){ $("gmsg").textContent = "Scrivi almeno una cosa."; return; }
+  send({type:"regali", name:current.name, gifts:t});
+  $("gmsg").style.color = "inherit";
+  $("gmsg").textContent = "Ricevuto. Ti voglio bene.";
+  $("send").disabled = true;
+});
+function dodge(e){
+  if(e) e.preventDefault();
+  const box = $("yn"), y = $("yes");
+  const maxL = Math.max(0, box.clientWidth - y.offsetWidth);
+  const maxT = Math.max(0, box.clientHeight - y.offsetHeight);
+  y.style.left = Math.round(Math.random()*maxL) + "px";
+  y.style.top = Math.round(Math.random()*maxT) + "px";
+}
+["pointerenter","pointerdown","touchstart","focus","click"].forEach(ev => $("yes").addEventListener(ev, dodge, {passive:false}));
+$("no").addEventListener("click", () => { $("done").hidden = true; $("gtitle").textContent = `Ok ${current.name}, dimmi tutto`; $("gifts").hidden = false; });
+$("enter").addEventListener("click", check);
+$("answer").addEventListener("keydown", e => { if(e.key === "Enter") check(); });
+</script>
+</body>
+</html>
